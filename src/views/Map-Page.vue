@@ -42,8 +42,17 @@
 </style>
 
 <script>
+/* eslint-disable no-console */
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue';
+
+const cors_anywhere = "https://cors-anywhere.herokuapp.com/";
+
+let googPlaces = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
+const googKey = "AIzaSyA3n660Vlzu3QtlXb_SfIgDVF627-i4fog";
+
+googPlaces += "key=" + googKey;
+googPlaces += "&inputtype=textquery&fields=geometry&input=170%20clark%20drive";
 
 export default {
     name: 'map-page',
@@ -94,6 +103,9 @@ export default {
             }]
         }
     },
+    mounted: function(){
+        this.UpdateMarkers();
+    },
     methods: {
         toggleInfoWindow: function(marker, idx) {
             this.infoWindowPos = marker.position;
@@ -110,23 +122,35 @@ export default {
                 this.currentMidx = idx;
             }
         },
-        UpdateMarkets: function() {
+        UpdateMarkers: function() {
             const newMarkers = [];
-            for(const job of this.$store.getter.getJobs){
+            console.log(this.$store.getters.getJobs)
+            for(const job of this.$store.getters.getJobs){
                 for(const jobLoc of job.locations.data){
                     const lat = jobLoc.lat;
                     const lng = jobLoc.lng;
                     const pos = {};
+                    
 
                     if(lat !== null && lng !== null){
                         pos.lat = lat;
                         pos.lng = lng;
                     }
-                    // else{
-                        
-                    // }
+                    else{
+                        pos.x = fetch(cors_anywhere + googPlaces,{
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                        }).then((response)=>{
+                            return response.json().then((data)=>{
+                                console.log(data);
+                                return data.predictions[0];
+                            });
+                        })
+                    }
                     newMarkers.push({
-                        position: pos
+                        position: pos,
                     })
                 }
             }
