@@ -3,7 +3,7 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
-
+ 
 import Paginate from 'vuejs-paginate'
 import * as VueGoogleMaps from 'vue2-google-maps'
 
